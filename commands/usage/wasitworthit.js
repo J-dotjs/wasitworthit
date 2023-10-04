@@ -172,7 +172,7 @@ async function gameplay(interaction, gameName, worth) {
             graphics(interaction, gameName, worth)
         } else if (selectionGameplay === 'trash') {
             worth += 0.25
-            console.log(worth)
+            interaction.followUp({ content: worth })
             graphics(interaction, gameName, worth)
         }
 
@@ -233,9 +233,62 @@ async function graphics(interaction, gameName, worth) {
             worth += 0.5
         }
 
-        console.log(worth)
-
+        interaction.followUp({ content: worth })
+        stability(interaction, gameName, worth)
         selectGraphicsCollector.stop();
     });
 }
 
+async function stability(interaction, gameName, worth) {
+    const selectStability = new StringSelectMenuBuilder()
+        .setCustomId('selectStability')
+        .setPlaceholder('Make a selection!')
+        .addOptions(
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Smooth')
+                .setDescription('The game is smooth and lag free.')
+                .setValue('smooth'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Runnable')
+                .setDescription('The game is runnable and comfortable.')
+                .setValue('runnable'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('OK')
+                .setDescription('The game jitters a bit.')
+                .setValue('ok'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Potato')
+                .setDescription('The game literally feels like you\'re playing on a potato.')
+                .setValue('potato')
+        );
+
+    const rowStability = new ActionRowBuilder()
+        .addComponents(selectStability);
+
+    await interaction.followUp({
+        content: `What would you rate the stability of ${gameName}?`,
+        components: [rowStability],
+        ephemeral: true
+    })
+
+    const selectStabilityCollector = interaction.channel.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 3_600_000 });
+    
+    selectStabilityCollector.on('collect', async i => {
+        const selectionStability = i.values[0];
+        if (selectionStability === 'smooth') {
+            worth += 2
+        }
+        else if (selectionStability === 'runnable') {
+            worth += 1
+        }
+        else if (selectionStability === 'ok') {
+            worth += 0.5
+        }
+        else if (selectionStability === 'potato') {
+            worth += 0
+        }
+        interaction.followUp({ content: worth })
+
+        selectStabilityCollector.stop();
+    })
+}
