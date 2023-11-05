@@ -172,7 +172,7 @@ async function gameplay(interaction, gameName, worth) {
             graphics(interaction, gameName, worth)
         } else if (selectionGameplay === 'trash') {
             worth += 0.25
-            console.log(worth)
+            interaction.followUp({ content: worth })
             graphics(interaction, gameName, worth)
         }
 
@@ -243,8 +243,8 @@ async function graphics(interaction, gameName, worth) {
             stability(interaction, gameName, worth)
         }
 
-        console.log(worth)
-
+        interaction.followUp({ content: worth })
+        stability(interaction, gameName, worth)
         selectGraphicsCollector.stop();
     });
 }
