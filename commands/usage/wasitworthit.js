@@ -216,21 +216,31 @@ async function graphics(interaction, gameName, worth) {
         ephemeral: true
     });
 
-    const selectGraphicsCollector = interaction.channel.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 3_600_000 });
+    const selectGraphicsCollector = interaction.channel.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 3_600_000, max: 1 });
 
     selectGraphicsCollector.on('collect', async i => {
         const selectionGraphics = i.values[0];
-
+        i.deferUpdate()
         if (selectionGraphics === 'fabulous') {
             worth += 8
+            console.log(worth)
+            stability(interaction, gameName, worth)
         } else if (selectionGraphics === 'great') {
             worth += 5
+            console.log(worth)
+            stability(interaction, gameName, worth)
         } else if (selectionGraphics === 'mid') {
             worth += 3.5
+            console.log(worth)
+            stability(interaction, gameName, worth)
         } else if (selectionGraphics === 'low') {
             worth += 2
+            console.log(worth)
+            stability(interaction, gameName, worth)
         } else if (selectionGraphics === 'awful') {
             worth += 0.5
+            console.log(worth)
+            stability(interaction, gameName, worth)
         }
 
         console.log(worth)
@@ -239,3 +249,56 @@ async function graphics(interaction, gameName, worth) {
     });
 }
 
+async function stability(interaction, gameName, worth) {
+    
+    const selectStability = new StringSelectMenuBuilder()
+        .setCustomId('selectStability')
+        .setPlaceholder('Make a selection!')
+        .addOptions(
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Stable!')
+                .setDescription('The stability of the game is the best stability of a game you have ever seen.')
+                .setValue('stable'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Great')
+                .setDescription('The stability  of the game is great.')
+                .setValue('great'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Mid')
+                .setDescription('The stability of the game isn\'t bad but it isn\'t great.')
+                .setValue('mid'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('Potato')
+                .setDescription('The stability of the game is like youre playing on a potato.')
+                .setValue('low')
+        );
+    
+    const rowStability = new ActionRowBuilder()
+        .addComponents(selectStability);
+
+    await interaction.followUp({
+        content: `What would you rate the stability of ${gameName}?`,
+        components: [rowStability],
+        ephemeral: true
+    })
+
+    const selectStabilityCollector = interaction.channel.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 3_600_000, max: 1 });
+
+    selectStabilityCollector.on('collect', async i => {
+        const selectionStability = i.values[0];
+        i.deferUpdate()
+        if (selectionStability === 'stable') {
+            worth+=6
+        } else if (selectionStability === 'great') {
+            worth+=4
+        } else if (selectionStability === 'mid') {
+            worth+=3
+        } else if (selectionStability === 'low') {
+            worth+=1
+        }
+
+        console.log(worth)
+
+        selectStabilityCollector.stop();
+    })
+}
